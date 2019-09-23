@@ -6,5 +6,5 @@
 -->
 
 # sqlx-selector
-- SELECT columns generator library for sqlx
-- For queries using JOIN
+- SELECT columns helper library for sqlx
+- Maybe useful for queries using JOIN
