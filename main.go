@@ -5,18 +5,21 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx/reflectx"
+	"golang.org/x/xerrors"
 )
 
 type SqlxSelector struct {
-	node *structElementNode
+	node    *structElementNode
+	columns []string
+	err     error
 }
 
-func New(arg interface{}) (*SqlxSelector, error) {
-	return NewWithMapper(arg, reflectx.NewMapperFunc("db", strings.ToLower))
+func New(dst interface{}) (*SqlxSelector, error) {
+	return NewWithMapper(dst, reflectx.NewMapperFunc("db", strings.ToLower))
 }
 
-func NewWithMapper(arg interface{}, mapper *reflectx.Mapper) (*SqlxSelector, error) {
-	m := mapper.FieldMap(reflect.ValueOf(arg))
+func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (*SqlxSelector, error) {
+	m := mapper.FieldMap(reflect.ValueOf(dst))
 
 	node := &structElementNode{}
 
@@ -29,6 +32,49 @@ func NewWithMapper(arg interface{}, mapper *reflectx.Mapper) (*SqlxSelector, err
 	}, nil
 }
 
-func Select(arg interface{}, selectColumns ...string) {
+func (s *SqlxSelector) Select(column string) {
+	s.columns = append(s.columns, "`"+column, "`")
+}
 
+func (s *SqlxSelector) SelectAs(column, as string) {
+	s.columns = append(s.columns, "`"+column+"` AS "+doubleQuote(as))
+}
+
+func (s *SqlxSelector) SelectStructAs(column, as string) *SqlxSelector {
+	ass := splitPath(as)
+
+	if len(ass) != 0 && ass[len(ass)-1] == "*" {
+		ass = ass[:len(ass)-1]
+	}
+
+	node := s.node.findNode(ass...)
+
+	if node == nil {
+		s.err = xerrors.Errorf("unknown node in %v", as)
+		return s
+	}
+
+	columnPrefix := strings.TrimSuffix(column, "*")
+
+	elms := node.listElements()
+
+	for i := range elms {
+		s.SelectAs(columnPrefix+elms[i], strings.Join(append(ass, elms[i]), "."))
+	}
+
+	return s
+}
+
+func (s *SqlxSelector) String() string {
+	if s.err != nil {
+		return ""
+	}
+	return strings.Join(s.columns, ",")
+}
+
+func (s *SqlxSelector) StringError() (string, error) {
+	if s.err != nil {
+		return "", s.err
+	}
+	return strings.Join(s.columns, ","), nil
 }
