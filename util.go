@@ -10,7 +10,7 @@ func splitPath(path string) []string {
 }
 
 func doubleQuote(s string) string {
-	q, _ := json.Marshal([]byte(s))
+	q, _ := json.Marshal(s)
 
 	return string(q)
 }

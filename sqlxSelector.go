@@ -32,12 +32,20 @@ func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (*SqlxSelector, err
 	}, nil
 }
 
-func (s *SqlxSelector) Select(column string) {
-	s.columns = append(s.columns, "`"+column, "`")
+func (s *SqlxSelector) Select(column string) *SqlxSelector {
+	s.columns = append(s.columns, "`"+column+"`")
+
+	return s
 }
 
-func (s *SqlxSelector) SelectAs(column, as string) {
+func (s *SqlxSelector) SelectAs(column, as string) *SqlxSelector {
 	s.columns = append(s.columns, "`"+column+"` AS "+doubleQuote(as))
+
+	return s
+}
+
+func (s *SqlxSelector) SelectStruct(column string) *SqlxSelector {
+	return s.SelectStructAs(column, column)
 }
 
 func (s *SqlxSelector) SelectStructAs(column, as string) *SqlxSelector {
@@ -72,7 +80,7 @@ func (s *SqlxSelector) String() string {
 	return strings.Join(s.columns, ",")
 }
 
-func (s *SqlxSelector) StringError() (string, error) {
+func (s *SqlxSelector) StringWithError() (string, error) {
 	if s.err != nil {
 		return "", s.err
 	}
