@@ -115,7 +115,7 @@ func TestSqlxSelector(t *testing.T) {
 		}
 	})
 
-	t.Run("select_struct_as_3", func(t *testing.T) {
+	t.Run("select_struct", func(t *testing.T) {
 		type user struct {
 			ID   int    `db:"id"`
 			Name string `db:"name"`
@@ -150,6 +150,45 @@ func TestSqlxSelector(t *testing.T) {
 		str = strings.Join(s, ",")
 
 		if want := "`groups.id` AS \"groups.id\",`groups.name` AS \"groups.name\",`users.id` AS \"users.id\",`users.name` AS \"users.name\""; str != want {
+			t.Fatalf("want(%s) != got(%s)", want, str)
+		}
+	})
+
+	t.Run("select_struct_limit", func(t *testing.T) {
+		type user struct {
+			ID   int    `db:"id"`
+			Name string `db:"name"`
+		}
+		type group struct {
+			ID   int    `db:"id"`
+			Name string `db:"name"`
+		}
+
+		type dataType struct {
+			User  *user  `db:"users"`
+			Group *group `db:"groups"`
+		}
+
+		selector, err := New(&dataType{})
+
+		if err != nil {
+			t.Fatalf("failed to initialize sql selector: %v", err)
+		}
+
+		str, err := selector.
+			SelectStruct("users.*", "id").
+			SelectStruct("groups.*", "name").
+			StringWithError()
+
+		if err != nil {
+			t.Fatalf("failed to select: %v", err)
+		}
+
+		s := strings.Split(str, ",")
+		sort.Strings(s)
+		str = strings.Join(s, ",")
+
+		if want := "`groups.name` AS \"groups.name\",`users.id` AS \"users.id\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
 		}
 	})
