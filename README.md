@@ -34,7 +34,7 @@ db.QueryRowx(
     `SELECT` + 
         sqlxselect.New(j).
             SelectAs("users.updated_at", "user_updated_at").
-            SelectStructAs("users.*", "user.*").
+            SelectStructAs("users.*", "user.*", "id". "name"). // select only id and name
             SelectStructAs("groups.*", "group.*").
             String() +
     `FROM users INNER JOIN groups ON users.group_id = groups.id LIMIT 1`
