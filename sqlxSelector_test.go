@@ -8,11 +8,7 @@ import (
 
 func TestSqlxSelector(t *testing.T) {
 	t.Run("select", func(t *testing.T) {
-		selector, err := New(struct{}{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(struct{}{})
 
 		str, err := selector.
 			Select("column-1").
@@ -28,11 +24,7 @@ func TestSqlxSelector(t *testing.T) {
 		}
 	})
 	t.Run("select_as", func(t *testing.T) {
-		selector, err := New(struct{}{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(struct{}{})
 
 		str, err := selector.
 			SelectAs("column-1", "as-1").
@@ -54,11 +46,7 @@ func TestSqlxSelector(t *testing.T) {
 			Name string `db:"name"`
 		}
 
-		selector, err := New(&dataType{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(&dataType{})
 
 		str, err := selector.
 			SelectStructAs("users.*", "*").
@@ -91,11 +79,7 @@ func TestSqlxSelector(t *testing.T) {
 			Group *group `db:"group"`
 		}
 
-		selector, err := New(&dataType{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(&dataType{})
 
 		str, err := selector.
 			SelectStructAs("users.*", "user.*").
@@ -130,11 +114,7 @@ func TestSqlxSelector(t *testing.T) {
 			Group *group `db:"groups"`
 		}
 
-		selector, err := New(&dataType{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(&dataType{})
 
 		str, err := selector.
 			SelectStruct("users.*").
@@ -169,11 +149,7 @@ func TestSqlxSelector(t *testing.T) {
 			Group *group `db:"groups"`
 		}
 
-		selector, err := New(&dataType{})
-
-		if err != nil {
-			t.Fatalf("failed to initialize sql selector: %v", err)
-		}
+		selector := New(&dataType{})
 
 		str, err := selector.
 			SelectStruct("users.*", "id").
@@ -190,6 +166,16 @@ func TestSqlxSelector(t *testing.T) {
 
 		if want := "`groups.name` AS \"groups.name\",`users.id` AS \"users.id\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
+		}
+	})
+
+	t.Run("new_for_non_struct_value", func(t *testing.T) {
+		selector := New("")
+
+		_, err := selector.StringWithError()
+
+		if err == nil {
+			t.Error("New for string should return an error")
 		}
 	})
 }

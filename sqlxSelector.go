@@ -16,12 +16,21 @@ type SqlxSelector struct {
 }
 
 // New generates SqlxSelector with default mapper
-func New(dst interface{}) (*SqlxSelector, error) {
+func New(dst interface{}) *SqlxSelector {
 	return NewWithMapper(dst, reflectx.NewMapperFunc("db", strings.ToLower))
 }
 
 // NewWithMapper generates SqlxSelector with specified mapper
-func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (*SqlxSelector, error) {
+func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (s *SqlxSelector) {
+	defer func() {
+		if err := recover(); err != nil {
+			s = &SqlxSelector{
+				Errors: []error{
+					xerrors.Errorf("cannot generate field map for dst: %w", err),
+				},
+			}
+		}
+	}()
 	m := mapper.FieldMap(reflect.ValueOf(dst))
 
 	node := &structElementNode{}
@@ -32,7 +41,7 @@ func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (*SqlxSelector, err
 
 	return &SqlxSelector{
 		node: node,
-	}, nil
+	}
 }
 
 // Select adds the column directly to query
@@ -60,6 +69,10 @@ func (s *SqlxSelector) SelectStruct(column string, limit ...string) *SqlxSelecto
 // 'limit' can specify columns to add
 // ex. SelectStructAs("users.*" /* table name */, "user." /* 'db:""' name */, "id", "name" /* columns to select */)
 func (s *SqlxSelector) SelectStructAs(column, as string, limit ...string) *SqlxSelector {
+	if len(s.Errors) != 0 {
+		return s
+	}
+
 	ass := splitPath(as)
 
 	if len(ass) != 0 && ass[len(ass)-1] == "*" {
