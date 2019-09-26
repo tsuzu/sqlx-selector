@@ -95,7 +95,9 @@ func (s *SqlxSelector) SelectStructAs(column, as string, limit ...string) *SqlxS
 			_, found := elmsSet[limit[i]]
 
 			if !found {
+				s.Errors = append(s.Errors, xerrors.Errorf("unknown column: %s", limit[i]))
 
+				continue
 			}
 		}
 
