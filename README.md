@@ -30,10 +30,9 @@ type join struct {
 }
 
 var j join
-selector, _ := sqlxselect.New(j) # Read #1
 db.QueryRowx(
     `SELECT` + 
-        selector.
+        sqlxselect.New(j).
             SelectAs("users.updated_at", "user_updated_at").
             SelectStructAs("users.*", "user.*", "id". "name"). // select only id and name
             SelectStructAs("groups.*", "group.*").
