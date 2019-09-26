@@ -1,6 +1,6 @@
-module github.com/cs3238-tsuzu/sqlx-selector
+module github.com/cs3238-tsuzu/sqlx-selector/v2
 
-go 1.12
+go 1.13
 
 require (
 	github.com/jmoiron/sqlx v1.2.0
