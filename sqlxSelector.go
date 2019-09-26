@@ -53,7 +53,7 @@ func (s *SqlxSelector) Select(column string) *SqlxSelector {
 
 // SelectAs adds the column and 'AS' name directly to query
 func (s *SqlxSelector) SelectAs(column, as string) *SqlxSelector {
-	s.columns = append(s.columns, "`"+column+"` AS "+doubleQuote(as))
+	s.columns = append(s.columns, column+" AS "+doubleQuote(as))
 
 	return s
 }
