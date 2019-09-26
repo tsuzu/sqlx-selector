@@ -30,13 +30,14 @@ type join struct {
 }
 
 var j join
+selector, _ := sqlxselect.New(j) # Read #1
 db.QueryRowx(
     `SELECT` + 
-        sqlxselect.New(j).
+        selector.
             SelectAs("users.updated_at", "user_updated_at").
             SelectStructAs("users.*", "user.*", "id". "name"). // select only id and name
             SelectStructAs("groups.*", "group.*").
             String() +
-    `FROM users INNER JOIN groups ON users.group_id = groups.id LIMIT 1`
+        `FROM users INNER JOIN groups ON users.group_id = groups.id LIMIT 1`,
 ).StructScan(&j)
 ```
