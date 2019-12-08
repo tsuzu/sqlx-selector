@@ -16,27 +16,26 @@ with sqlx
 type User struct {
     ID string `db:"id"`
     Name string `db:"name"`
-    GroupID string `db:"group_id"`
+    OrganizationID string `db:"org_id"`
 }
-type Group struct {
+type Organization struct {
     ID string `db:"id"`
     Name string `db:"name"`
 }
 
-type join struct {
-    User *User `db:"user"`
-    Group *Group `db:"group"`
-    UserUpdatedAt time.Time `db:"user_updated_at"`
+var j struct {
+    User *User `db:"u"`
+    Organization *Organization `db:"org"`
+    UserUpdatedAt time.Time `db:"updated_at"`
 }
 
-var j join
 db.QueryRowx(
     `SELECT` + 
         sqlxselect.New(j).
-            SelectAs("users.updated_at", "user_updated_at").
-            SelectStructAs("users.*", "user.*", "id". "name"). // select only id and name
-            SelectStructAs("groups.*", "group.*").
+            SelectAs("u.updated_at", "updated_at").
+            SelectStructAs("u.*", "user.*", "id", "name"). // select only id and name
+            SelectStructAs("org.*", "org.*").
             String() +
-        `FROM users INNER JOIN groups ON users.group_id = groups.id LIMIT 1`,
+        `FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1`,
 ).StructScan(&j)
 ```
