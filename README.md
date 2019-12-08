@@ -9,6 +9,11 @@
 - SELECT columns helper library for sqlx
 - Maybe useful for queries using JOIN
 
+## Installation
+```
+go get github.com/cs3238-tsuzu/sqlx-selector/v2
+```
+
 ## Usage
 with sqlx
 
