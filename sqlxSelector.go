@@ -26,6 +26,7 @@ func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (s *SqlxSelector) {
 	defer func() {
 		if err := recover(); err != nil {
 			s = &SqlxSelector{
+				ce: DefaultColumnEscaper,
 				Errors: []error{
 					xerrors.Errorf("cannot generate field map for dst: %w", err),
 				},

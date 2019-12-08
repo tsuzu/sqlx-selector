@@ -18,29 +18,40 @@ go get github.com/cs3238-tsuzu/sqlx-selector/v2
 with sqlx
 
 ```go
-type User struct {
-    ID string `db:"id"`
-    Name string `db:"name"`
-    OrganizationID string `db:"org_id"`
-}
-type Organization struct {
-    ID string `db:"id"`
-    Name string `db:"name"`
-}
+package main
 
-var j struct {
-    User *User `db:"u"`
-    Organization *Organization `db:"org"`
-    UserUpdatedAt time.Time `db:"updated_at"`
-}
+import (
+	"fmt"
+	"time"
 
-db.QueryRowx(
-    `SELECT` + 
-        sqlxselect.New(j).
-            SelectAs("u.updated_at", "updated_at").
-            SelectStructAs("u.*", "user.*", "id", "name"). // select only id and name
-            SelectStructAs("org.*", "org.*").
-            String() +
-        `FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1`,
-).StructScan(&j)
+	sqlxselect "github.com/cs3238-tsuzu/sqlx-selector/v2"
+)
+
+func main() {
+	type User struct {
+		ID             string `db:"id"`
+		Name           string `db:"name"`
+		OrganizationID string `db:"org_id"`
+	}
+	type Organization struct {
+		ID   string `db:"id"`
+		Name string `db:"name"`
+	}
+
+	var joined struct {
+		User          *User         `db:"u"`
+		Organization  *Organization `db:"org"`
+		UserUpdatedAt time.Time     `db:"updated_at"`
+	}
+
+	fmt.Println(
+		`SELECT ` +
+			sqlxselect.New(&joined).
+				SelectAs("u.updated_at", "updated_at").
+				SelectStructAs("u.*", "u.*", "id", "name"). // select only id and name
+				SelectStructAs("org.*", "org.*").
+				String() +
+			`FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1`,
+	)
+}
 ```

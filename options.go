@@ -28,8 +28,4 @@ var (
 )
 
 // DefaultColumnEscaper is used in New/NewWithMapper
-var DefaultColumnEscaper ColumnEscaper
-
-func init() {
-	DefaultColumnEscaper = Backquote
-}
+var DefaultColumnEscaper = Backquote
