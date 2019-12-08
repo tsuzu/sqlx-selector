@@ -51,7 +51,12 @@ func main() {
 				SelectStructAs("u.*", "u.*", "id", "name"). // select only id and name
 				SelectStructAs("org.*", "org.*").
 				String() +
-			`FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1`,
+			` FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1`,
 	)
 }
+```
+
+The output will be:
+```
+SELECT `u`.`updated_at` AS "updated_at",`u`.`id` AS "u.id",`u`.`name` AS "u.name",`org`.`name` AS "org.name",`org`.`id` AS "org.id" FROM users AS u INNER JOIN organizations AS org ON u.org_id = org.id LIMIT 1
 ```
