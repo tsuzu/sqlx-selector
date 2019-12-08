@@ -11,6 +11,7 @@ import (
 // SqlxSelector is a generator of columns in SELECT query
 type SqlxSelector struct {
 	node    *structElementNode
+	ce      ColumnEscaper
 	columns []string
 	Errors  []error
 }
@@ -41,19 +42,27 @@ func NewWithMapper(dst interface{}, mapper *reflectx.Mapper) (s *SqlxSelector) {
 
 	return &SqlxSelector{
 		node: node,
+		ce:   DefaultColumnEscaper,
 	}
+}
+
+// WithColumnEscaper specifies a function to escape column names
+func (s *SqlxSelector) WithColumnEscaper(ce ColumnEscaper) *SqlxSelector {
+	s.ce = ce
+
+	return s
 }
 
 // Select adds the column directly to query
 func (s *SqlxSelector) Select(column string) *SqlxSelector {
-	s.columns = append(s.columns, "`"+column+"`")
+	s.columns = append(s.columns, s.ce(column))
 
 	return s
 }
 
 // SelectAs adds the column and 'AS' name directly to query
 func (s *SqlxSelector) SelectAs(column, as string) *SqlxSelector {
-	s.columns = append(s.columns, column+" AS "+doubleQuote(as))
+	s.columns = append(s.columns, s.ce(column)+" AS "+doubleQuote(as))
 
 	return s
 }

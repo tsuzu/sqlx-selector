@@ -60,7 +60,7 @@ func TestSqlxSelector(t *testing.T) {
 		sort.Strings(s)
 		str = strings.Join(s, ",")
 
-		if want := "`users.id` AS \"id\",`users.name` AS \"name\""; str != want {
+		if want := "`users`.`id` AS \"id\",`users`.`name` AS \"name\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
 		}
 	})
@@ -94,7 +94,7 @@ func TestSqlxSelector(t *testing.T) {
 		sort.Strings(s)
 		str = strings.Join(s, ",")
 
-		if want := "`groups.id` AS \"group.id\",`groups.name` AS \"group.name\",`users.id` AS \"user.id\",`users.name` AS \"user.name\""; str != want {
+		if want := "`groups`.`id` AS \"group.id\",`groups`.`name` AS \"group.name\",`users`.`id` AS \"user.id\",`users`.`name` AS \"user.name\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
 		}
 	})
@@ -129,7 +129,7 @@ func TestSqlxSelector(t *testing.T) {
 		sort.Strings(s)
 		str = strings.Join(s, ",")
 
-		if want := "`groups.id` AS \"groups.id\",`groups.name` AS \"groups.name\",`users.id` AS \"users.id\",`users.name` AS \"users.name\""; str != want {
+		if want := "`groups`.`id` AS \"groups.id\",`groups`.`name` AS \"groups.name\",`users`.`id` AS \"users.id\",`users`.`name` AS \"users.name\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
 		}
 	})
@@ -164,7 +164,7 @@ func TestSqlxSelector(t *testing.T) {
 		sort.Strings(s)
 		str = strings.Join(s, ",")
 
-		if want := "`groups.name` AS \"groups.name\",`users.id` AS \"users.id\""; str != want {
+		if want := "`groups`.`name` AS \"groups.name\",`users`.`id` AS \"users.id\""; str != want {
 			t.Fatalf("want(%s) != got(%s)", want, str)
 		}
 	})
